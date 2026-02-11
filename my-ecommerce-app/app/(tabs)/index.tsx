@@ -1,31 +1,24 @@
-import { StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator } from 'react-native';
+import { useGetProductsQuery } from '../../src/store/services/productApi';
+import { FlashList } from '@shopify/flash-list';
+import ProductCard from '../../src/components/ProductCard'; // We will build this next
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+export default function CatalogScreen() {
+  const { data, error, isLoading } = useGetProductsQuery({ offset: 0, limit: 10 });
 
-export default function TabOneScreen() {
+  if (isLoading) return <View className="flex-1 justify-center"><ActivityIndicator size="large" color="#1D7DFC" /></View>;
+  
+  if (error) return <View className="flex-1 justify-center items-center"><Text>Oops! Something went wrong.</Text></View>;
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+    <View className="flex-1 bg-surface p-4">
+      <Text className="text-2xl font-bold mb-4">E-Shop</Text>
+      <FlashList
+        data={data}
+        renderItem={({ item }) => <ProductCard product={item} />}
+        estimatedItemSize={100}
+        keyExtractor={(item) => item.id.toString()}
+      />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
